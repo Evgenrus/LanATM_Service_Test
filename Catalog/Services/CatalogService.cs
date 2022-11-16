@@ -131,6 +131,7 @@ public class CatalogService : ICatalogService
         return result;
     }
 
+    //TODO Add requests to Order and Delivery to actualize items database
     public async Task PostNewItem(ItemModel model)
     {
         var brand = await _context.Brands.SingleOrDefaultAsync(x => x.Name == model.Brand);
@@ -152,31 +153,109 @@ public class CatalogService : ICatalogService
             Name = model.Name,
             Stock = model.Stock
         });
-        throw new NotImplementedException();
+        await _context.SaveChangesAsync();
     }
 
     public async Task PostNewBrand(BrandModel model)
     {
-        throw new NotImplementedException();
+        if (await _context.Brands.FirstOrDefaultAsync(x => x.Name == model.Name) is not null)
+            throw new NotUniqueException("This Brand already exists");
+
+        await _context.Brands.AddAsync(new Brand() {
+            Name = model.Name,
+            Descr = model.Descr,
+            LogoURL = model.LogoURL
+        });
+        await _context.SaveChangesAsync();
     }
 
     public async Task PostNewCategory(CategoryModel model)
     {
-        throw new NotImplementedException();
+        if (await _context.Categories.FirstOrDefaultAsync(x => x.Name == model.Name) is not null)
+            throw new NotUniqueException("This category already exists");
+
+        await _context.Categories.AddAsync(new Category() {
+            Name = model.Name,
+            Descr = model.Descr
+        });
+        await _context.SaveChangesAsync();
     }
 
     public async Task Restock(string article, int count)
     {
-        throw new NotImplementedException();
+        var item = await _context.Items.SingleOrDefaultAsync(x => 
+            x.Article == article
+        );
+        if (item is null)
+            throw new ArgumentException($"Couldn't find item with article {article}");
+
+        if (item.Stock + count > 500 || item.Stock + count < 0)
+            throw new ArgumentException($"Stock ust be between 0 and 500, but got {item.Stock + count}");
+
+        item.Stock += count;
+        await _context.SaveChangesAsync();
     }
 
     public async Task<ItemModel> AddItemToCart(ItemModel model)
     {
-        throw new NotImplementedException();
+        var item = await _context.Items.Include(x => x.Brand)
+            .Include(x => x.Category)
+            .SingleOrDefaultAsync(x => 
+                x.Name == model.Name && 
+                x.Article == model.Article
+        );
+
+        if (model.Stock < 1)
+            throw new ArgumentException("You must add at least 1 item");
+
+        if (item is null)
+            throw new InvalidItemException($"Couldn't find item with Name {model.Name} and Article {model.Article}");
+
+        if (item.Stock - model.Stock < 0)
+            throw new OutOfStockException($"Have only {item.Stock}, but requested {model.Stock}");
+
+        return new ItemModel() {
+            Id = item.Id,
+            Name = item.Name,
+            Article = item.Article,
+            Descr = item.Descr,
+            Brand = item.Brand.Name,
+            Category = item.Category.Name,
+            Stock = model.Stock
+        };
     }
 
     public async Task<ICollection<ItemModel>> OrderItems(List<ItemModel> items)
     {
-        throw new NotImplementedException();
+        var res = new List<ItemModel>();
+        foreach (var model in items)
+        {
+            var item = await _context.Items.Include(x => x.Brand)
+            .Include(x => x.Category)
+            .SingleOrDefaultAsync(x => 
+                x.Name == model.Name && 
+                x.Article == model.Article
+            );
+
+            if (model.Stock < 1)
+            throw new ArgumentException("You must add at least 1 item");
+
+            if (item is null)
+                throw new InvalidItemException($"Couldn't find item with Name {model.Name} and Article {model.Article}");
+
+            if (item.Stock - model.Stock < 0)
+                throw new OutOfStockException($"Have only {item.Stock}, but requested {model.Stock}");
+
+            res.Add(new ItemModel() {
+                Id = item.Id,
+                Name = item.Name,
+                Article = item.Article,
+                Descr = item.Descr,
+                Brand = item.Brand.Name,
+                Category = item.Category.Name,
+                Stock = model.Stock
+            });
+        }
+        return res;
     }
 }

@@ -1,4 +1,5 @@
 using Catalog.Models;
+using Catalog.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,34 +10,68 @@ namespace Catalog.Controllers;
 public class CatalogController : ControllerBase
 {
     private readonly ILogger<CatalogController> _logger;
+    private readonly ICatalogService _service;
 
-    public CatalogController(ILogger<CatalogController> logger)
+    public CatalogController(ILogger<CatalogController> logger, ICatalogService service)
     {
         _logger = logger;
+        _service = service;
     }
 
     [HttpGet]
     public async Task<ActionResult<ItemModel>> GetItemById(int id)
     {
-        return StatusCode(501);
+        try
+        {
+            var res = await _service.GetItemById(id);
+            return Ok(res);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpGet]
     public async Task<ActionResult<ICollection<ItemModel>>> GetItemsByBrandName(string brand)
     {
-        return StatusCode(501);
+        try
+        {
+            var res = await _service.GetItemsByBrandName(brand);
+            return Ok(res);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpGet]
     public async Task<ActionResult<ItemModel>> GetItemByName(string name)
     {
-        return StatusCode(501);
+        try
+        {
+            var res = await _service.GetItemByName(name);
+            return Ok(res);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpGet]
     public async Task<ActionResult<ICollection<ItemModel>>> GetItemsByCategoryName(string category)
     {
-        return StatusCode(501);
+        try
+        {
+            var res = await _service.GetItemsByCategoryName(category);
+            return Ok(res);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
@@ -44,13 +79,33 @@ public class CatalogController : ControllerBase
     {
         if (!ModelState.IsValid)
             return BadRequest();
-        return StatusCode(501);
+        
+        try
+        {
+            await _service.PostNewItem(model);
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult> PostNewBrand(BrandModel model)
     {
-        return StatusCode(501);
+        if(!ModelState.IsValid)
+            return BadRequest();
+
+        try
+        {
+            await _service.PostNewBrand(model);
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
