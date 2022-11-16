@@ -15,8 +15,6 @@ public class ItemModel : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         var errors = new List<ValidationResult>();
-        if (Id < 1)
-            errors.Add(new ValidationResult("id couldn't be less then 1"));
         if (string.IsNullOrWhiteSpace(Name))
             errors.Add(new ValidationResult("Name couldn't be empty, null, or consists only whitespaces", new List<string>() {"Name"}));
         if (string.IsNullOrWhiteSpace(Article))

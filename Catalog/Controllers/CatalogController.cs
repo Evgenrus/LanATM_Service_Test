@@ -1,6 +1,5 @@
 using Catalog.Models;
 using Catalog.Services;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.Controllers;
@@ -111,24 +110,65 @@ public class CatalogController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> PostNewCategory(CategoryModel model)
     {
-        return StatusCode(501);
+        if(!ModelState.IsValid)
+            return BadRequest();
+
+        try
+        {
+            await _service.PostNewCategory(model);
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPatch]
     public async Task<ActionResult> Restock(string article, int count)
     {
-        return StatusCode(501);
+        try
+        {
+            await _service.Restock(article, count);
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<ItemModel>> AddItemToCart(ItemModel model)
     {
-        return StatusCode(501);
+        if (!ModelState.IsValid)
+            return BadRequest();
+        
+        try
+        {
+            var res = await _service.AddItemToCart(model);
+            return Ok(res);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     public async Task<ActionResult<ICollection<ItemModel>>> OrderItems(List<ItemModel> items)
     {
-        return StatusCode(501);
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+        try
+        {
+            var res = await _service.OrderItems(items);
+            return Ok(res);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }

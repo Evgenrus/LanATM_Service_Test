@@ -12,8 +12,6 @@ public class CategoryModel : IValidatableObject
     {
         var errors = new List<ValidationResult>();
         
-        if(Id < 1)
-            errors.Add(new ValidationResult("Id couldn't be less than 1", new List<string>() {"Id"}));
         if(string.IsNullOrWhiteSpace(Name))
             errors.Add(new ValidationResult("Brand name couldn't be empty, null, or contains only whitespaces", new List<string>() {"Brand"}));
         if(string.IsNullOrWhiteSpace(Descr))

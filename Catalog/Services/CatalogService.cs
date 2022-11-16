@@ -238,7 +238,7 @@ public class CatalogService : ICatalogService
             );
 
             if (model.Stock < 1)
-            throw new ArgumentException("You must add at least 1 item");
+                throw new ArgumentException("You must add at least 1 item");
 
             if (item is null)
                 throw new InvalidItemException($"Couldn't find item with Name {model.Name} and Article {model.Article}");
@@ -255,7 +255,10 @@ public class CatalogService : ICatalogService
                 Category = item.Category.Name,
                 Stock = model.Stock
             });
+            item.Stock -= model.Stock;
         }
+
+        await _context.SaveChangesAsync();
         return res;
     }
 }
