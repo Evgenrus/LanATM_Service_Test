@@ -1,4 +1,6 @@
-﻿namespace Catalog.Database.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Catalog.Database.Entities;
 
 public class Item
 {

@@ -13,13 +13,8 @@
     <projectFile profileName="Order">Order/Order.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7abcc57c-8733-491e-a6a9-930cc4cc6787" name="Changes" comment="DbContextAdded">
+    <list default="true" id="7abcc57c-8733-491e-a6a9-930cc4cc6787" name="Changes" comment="Controller added(methods not implemented)">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Test/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Test/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Catalog/Controllers/WeatherForecastController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Catalog/Controllers/CatalogController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Catalog/Database/Entities/Brand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Catalog/Database/Entities/Brand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Catalog/Database/Entities/Category.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Catalog/Database/Entities/Category.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Catalog/Database/Entities/Item.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Catalog/Database/Entities/Item.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Catalog/WeatherForecast.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,10 +34,19 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectId" id="2HaMLNLziiyg44FzAxI4u72Qzda" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.Larek: Gateway">
@@ -113,6 +117,7 @@
       <item itemvalue=".NET Launch Settings Profile.Order: IIS Express" />
     </list>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task id="LOCAL-00001" summary="DbContextAdded">
       <created>1668497449746</created>
@@ -121,8 +126,26 @@
       <option name="project" value="LOCAL" />
       <updated>1668497449746</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Controller added(methods not implemented)">
+      <created>1668499980986</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1668499980986</updated>
+    </task>
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7abcc57c-8733-491e-a6a9-930cc4cc6787" name="Changes" comment="Controller added(methods not implemented)" />
+      <created>1668518686350</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1668518686350</updated>
+      <workItem from="1668518689939" duration="12196000" />
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="Both" />
@@ -159,6 +182,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="DbContextAdded" />
-    <option name="LAST_COMMIT_MESSAGE" value="DbContextAdded" />
+    <MESSAGE value="Controller added(methods not implemented)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Controller added(methods not implemented)" />
   </component>
 </project>
