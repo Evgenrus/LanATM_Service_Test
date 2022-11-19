@@ -10,21 +10,16 @@ public class OrderDbContext : DbContext
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<Orders> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
-    public DbSet<Address> Addresses { get; set; }
 
     public OrderDbContext()
     {
+        //Database.EnsureDeleted();
         Database.EnsureCreated();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Customer>()
-            .HasMany(x => x.Addresses)
-            .WithOne(y => y.Customer)
-            .HasForeignKey(y => y.CustomerId);
 
         modelBuilder.Entity<Customer>()
             .HasMany(x => x.Carts)
