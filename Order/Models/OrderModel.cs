@@ -1,3 +1,5 @@
+using Order.Database.Entities;
+
 namespace Order.Models;
 
 public class OrderModel
