@@ -13,8 +13,17 @@
     <projectFile profileName="Order">Order/Order.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7abcc57c-8733-491e-a6a9-930cc4cc6787" name="Changes" comment="Controller added(methods not implemented)">
+
+    <list default="true" id="7abcc57c-8733-491e-a6a9-930cc4cc6787" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Test/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Test/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Order/Controllers/OrderController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Order/Controllers/OrderController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Order/Database/Entities/Address.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Order/Database/Entities/Customer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Order/Database/Entities/Customer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Order/Database/OrderDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Order/Database/OrderDbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Order/Models/CustomerModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Order/Models/CustomerModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Order/Models/OrderModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Order/Models/OrderModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Order/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Order/Program.cs" afterDir="false" />
+
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +36,16 @@
         <entry key="$PROJECT_DIR$" value="dev" />
       </map>
     </option>
+
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Larek/Program.cs" root0="FORCE_HIGHLIGHTING" />
@@ -40,6 +59,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+
+  <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="sqlserver.localdb" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager" selected=".NET Launch Settings Profile.Order: IIS Express">
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
@@ -51,6 +80,7 @@
   }
 }</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.Larek: Gateway">
+
     <configuration name="Larek: Gateway" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Catalog/Catalog.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net6.0" />
@@ -142,6 +172,12 @@
       <updated>1668518686350</updated>
       <workItem from="1668518689939" duration="12196000" />
       <workItem from="1668579459015" duration="399000" />
+      <workItem from="1668600120588" duration="8188000" />
+      <workItem from="1668664304824" duration="4418000" />
+      <workItem from="1668743217215" duration="174000" />
+      <workItem from="1668826972714" duration="448000" />
+      <workItem from="1668842592653" duration="1526000" />
+      <workItem from="1668854155874" duration="3402000" />
       <workItem from="1668600120588" duration="1000000" />
     </task>
     <option name="localTasksCounter" value="3" />
@@ -151,6 +187,7 @@
     <option name="version" value="3" />
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="false" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="Both" />
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -184,8 +221,41 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="DbContextAdded" />
     <MESSAGE value="Controller added(methods not implemented)" />
     <option name="LAST_COMMIT_MESSAGE" value="Controller added(methods not implemented)" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Order/Controllers/OrderController.cs</url>
+          <line>30</line>
+          <properties documentPath="D:\dev\LanATM_Service\LanATM_Service_Test\Order\Controllers\OrderController.cs" initialLine="30" containingFunctionPresentation="method 'GetCartById'">
+            <startOffsets>
+              <option value="722" />
+            </startOffsets>
+            <endOffsets>
+              <option value="751" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Order/Controllers/OrderController.cs</url>
+          <line>26</line>
+          <properties documentPath="D:\dev\LanATM_Service\LanATM_Service_Test\Order\Controllers\OrderController.cs" initialLine="26" containingFunctionPresentation="method 'GetCartById'">
+            <startOffsets>
+              <option value="646" />
+            </startOffsets>
+            <endOffsets>
+              <option value="661" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
