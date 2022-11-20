@@ -1,4 +1,5 @@
 using Catalog.Models;
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.Services;
@@ -24,4 +25,6 @@ public interface ICatalogService
     public Task<ItemModel> AddItemToCart(ItemModel model);
 
     public Task<ICollection<ItemModel>> OrderItems(List<ItemModel> items);
+
+    public Task<ICollection<ItemCheck>> CheckItems(List<ItemModel> models);
 }
