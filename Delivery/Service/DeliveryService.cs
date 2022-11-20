@@ -2,6 +2,8 @@
 using Delivery.Database.Entities;
 using Delivery.Exceptions;
 using Delivery.Models;
+using Infrastructure.Models;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
 
@@ -10,18 +12,28 @@ namespace Delivery.Service;
 public class DeliveryService : IDeliveryService
 {
     private readonly DeliveryDbContext _context;
+    private readonly IRequestClient<List<ItemModel>> _request;
 
-    public DeliveryService(DeliveryDbContext context)
+    public DeliveryService(DeliveryDbContext context, IRequestClient<List<ItemModel>> request)
     {
         _context = context;
+        _request = request;
     }
     
     public async Task PostNewDelivery(DeliveryModel delivery)
     {
         if (!delivery.Items.Any())
             throw new EmptyDeliveryException("Order doesn't contains any items");
-        
-        //TODO Check items
+
+        var check = new List<ItemCheck>();
+        using (var resp = _request.Create(delivery.Items))
+        {
+            var p = await resp.GetResponse<List<ItemCheck>>();
+            check = p.Message;
+        }
+
+        if (!check.Any())
+            throw new Exception();
 
         var items = new List<DeliveryItem>();
         foreach (var item in delivery.Items)
