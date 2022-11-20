@@ -1,9 +1,8 @@
-using System.Web.Http.ModelBinding;
 using Catalog.Database;
 using Catalog.Database.Entities;
 using Catalog.Exceptions;
 using Catalog.Models;
-using Microsoft.AspNetCore.Mvc;
+using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Services;
@@ -259,6 +258,53 @@ public class CatalogService : ICatalogService
         }
 
         await _context.SaveChangesAsync();
+        return res;
+    }
+
+    public async Task<ICollection<ItemCheck>> CheckItems(List<ItemModel> models)
+    {
+        if (!models.Any())
+            throw new EmptyItemsListException("Items list is empty");
+        var res = new List<ItemCheck>();
+        foreach (var model in models)
+        {
+            var item = await _context.Items.Include(x => x.Brand)
+                .Include(x => x.Category)
+                .SingleOrDefaultAsync(x =>
+                    x.Article == model.Article &&
+                    x.Name == model.Name &&
+                    x.Brand.Name == model.Brand &&
+                    x.Category.Name == model.Brand &&
+                    x.Stock <= model.Stock);
+            if (item is null)
+            {
+                res.Add(new ItemCheck()
+                {
+                    Article = model.Article,
+                    Brand = model.Brand,
+                    Category = model.Category,
+                    Name = model.Name,
+                    Id = 0,
+                    IsCorrect = false,
+                    RequestingCount = model.Stock,
+                    Stock = 0
+                });
+            }
+            else
+            {
+                res.Add(new ItemCheck()
+                {
+                    Article = item.Article,
+                    Brand = item.Brand.Name,
+                    Category = item.Category.Name,
+                    Id = item.Id,
+                    IsCorrect = item.Stock >= model.Stock,
+                    Name = item.Name,
+                    RequestingCount = model.Stock,
+                    Stock = item.Stock
+                });
+            }
+        }
         return res;
     }
 }

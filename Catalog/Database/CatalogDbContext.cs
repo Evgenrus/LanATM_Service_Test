@@ -11,6 +11,7 @@ public sealed class CatalogDbContext : DbContext
 
     public CatalogDbContext()
     {
+        //Database.EnsureDeleted();
         Database.EnsureCreated();
     }
 
