@@ -11,4 +11,9 @@ public class Courier
     public string Photo { get; set; }
 
     public List<OrderDelivery> Deliveries { get; set; }
+
+    public static string GetName(Courier courier)
+    {
+        return $"{courier.Name} {courier.Surname}";
+    }
 }

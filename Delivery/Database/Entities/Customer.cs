@@ -12,4 +12,9 @@ public class Customer
     
     public List<Address> Addresses { get; set; }
     public List<OrderDelivery> Deliveries { get; set; }
+    
+    public static string GetName(Customer customer)
+    {
+        return $"{customer.Name} {customer.Surname}";
+    }
 }

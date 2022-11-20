@@ -19,12 +19,6 @@ public sealed class DeliveryDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Customer>()
-            .HasMany(x => x.Deliveries)
-            .WithOne(y => y.Customer)
-            .HasForeignKey(y => y.CustomerId);
-
         modelBuilder.Entity<Customer>()
             .HasMany(x => x.Addresses)
             .WithOne(y => y.Customer)
@@ -39,6 +33,11 @@ public sealed class DeliveryDbContext : DbContext
             .HasMany(x => x.Items)
             .WithOne(y => y.Delivery)
             .HasForeignKey(y => y.DeliveryId);
+
+        modelBuilder.Entity<OrderDelivery>()
+            .HasOne(x => x.Address)
+            .WithMany(y => y.Deliveries)
+            .HasForeignKey(x => x.AddressId);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

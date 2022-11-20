@@ -1,6 +1,6 @@
 ﻿namespace Delivery.Database.Entities;
 
-internal enum Status : int
+public enum Status : int
 {
     Pending,
     Assigned,
@@ -11,12 +11,14 @@ internal enum Status : int
 public class OrderDelivery
 {
     public int Id { get; set; }
-    
-    public int? CustomerId { get; set; }
-    public Customer? Customer { get; set; }
+
+    public Status Status { get; set; } = Status.Pending;
     
     public int? CourierId { get; set; }
     public Courier? Courier { get; set; }
+    
+    public int? AddressId { get; set; }
+    public Address Address { get; set; }
 
     public List<DeliveryItem> Items { get; set; } = new List<DeliveryItem>();
 }
