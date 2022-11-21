@@ -26,5 +26,6 @@ public interface ICatalogService
 
     public Task<ICollection<ItemModel>> OrderItems(List<ItemModel> items);
 
-    public Task<ICollection<ItemCheck>> CheckItems(List<ItemModel> models);
+    public Task<IEnumerable<ItemCheck>> CheckItems(IEnumerable<ItemModel> models);
+    public Task<ItemCheck> CheckItem(ItemModel model);
 }

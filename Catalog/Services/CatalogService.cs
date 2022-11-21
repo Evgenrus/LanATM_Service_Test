@@ -261,12 +261,13 @@ public class CatalogService : ICatalogService
         return res;
     }
 
-    public async Task<ICollection<ItemCheck>> CheckItems(List<ItemModel> models)
+    public async Task<IEnumerable<ItemCheck>> CheckItems(IEnumerable<ItemModel> models)
     {
-        if (!models.Any())
+        var itemModels = models.ToList();
+        if (!itemModels.Any()) 
             throw new EmptyItemsListException("Items list is empty");
         var res = new List<ItemCheck>();
-        foreach (var model in models)
+        foreach (var model in itemModels)
         {
             var item = await _context.Items.Include(x => x.Brand)
                 .Include(x => x.Category)
@@ -305,6 +306,49 @@ public class CatalogService : ICatalogService
                 });
             }
         }
+        return res;
+    }
+
+    public async Task<ItemCheck> CheckItem(ItemModel model)
+    {
+        ItemCheck res;
+        var item = await _context.Items.Include(x => x.Brand)
+            .Include(x => x.Category)
+            .SingleOrDefaultAsync(x =>
+                x.Article == model.Article &&
+                x.Name == model.Name &&
+                x.Brand.Name == model.Brand &&
+                x.Category.Name == model.Brand &&
+                x.Stock <= model.Stock);
+        if (item is null)
+        {
+            res = new ItemCheck()
+            {
+                Article = model.Article,
+                Brand = model.Brand,
+                Category = model.Category,
+                Name = model.Name,
+                Id = 0,
+                IsCorrect = false,
+                RequestingCount = model.Stock,
+                Stock = 0
+            };
+        }
+        else
+        {
+            res = new ItemCheck()
+            {
+                Article = item.Article,
+                Brand = item.Brand.Name,
+                Category = item.Category.Name,
+                Id = item.Id,
+                IsCorrect = item.Stock >= model.Stock,
+                Name = item.Name,
+                RequestingCount = model.Stock,
+                Stock = item.Stock
+            };
+        }
+
         return res;
     }
 }

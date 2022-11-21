@@ -5,7 +5,7 @@ using MassTransit;
 
 namespace Catalog.Consumers;
 
-public class ItemsCheckConsumer : IConsumer<List<ItemModel>>
+public class ItemsCheckConsumer : IConsumer<IEnumerable<ItemModel>>
 {
     private ICatalogService _service;
 
@@ -14,7 +14,7 @@ public class ItemsCheckConsumer : IConsumer<List<ItemModel>>
         _service = service;
     }
     
-    public async Task Consume(ConsumeContext<List<ItemModel>> context)
+    public async Task Consume(ConsumeContext<IEnumerable<ItemModel>> context)
     {
         var content = context.Message;
         var res = await _service.CheckItems(content);
