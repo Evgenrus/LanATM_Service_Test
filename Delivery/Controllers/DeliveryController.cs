@@ -8,13 +8,13 @@ namespace Delivery.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
-public class WeatherForecastController : ControllerBase
+public class DeliveryController : ControllerBase
 {
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILogger<DeliveryController> _logger;
     private readonly IDeliveryService _service;
     private IRequestClient<ItemsToCheckList> _request;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IDeliveryService service, IRequestClient<ItemsToCheckList> request)
+    public DeliveryController(ILogger<DeliveryController> logger, IDeliveryService service, IRequestClient<ItemsToCheckList> request)
     {
         _logger = logger;
         _service = service;
