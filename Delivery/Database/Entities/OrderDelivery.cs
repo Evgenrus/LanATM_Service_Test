@@ -5,7 +5,8 @@ public enum Status : int
     Pending,
     Assigned,
     InProcess,
-    Delivered
+    Delivered,
+    Canceled
 }
 
 public class OrderDelivery
@@ -14,6 +15,8 @@ public class OrderDelivery
 
     public Status Status { get; set; } = Status.Pending;
     
+    public int OrderId { get; set; }
+
     public int? CourierId { get; set; }
     public Courier? Courier { get; set; }
     

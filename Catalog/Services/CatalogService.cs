@@ -261,12 +261,12 @@ public class CatalogService : ICatalogService
         return res;
     }
 
-    public async Task<ICollection<ItemCheck>> CheckItems(List<ItemModel> models)
+    public async Task<ItemsCheck> CheckItems(ItemsToCheckList toChecks)
     {
-        if (!models.Any())
+        if (!toChecks.Items.Any()) 
             throw new EmptyItemsListException("Items list is empty");
         var res = new List<ItemCheck>();
-        foreach (var model in models)
+        foreach (var model in toChecks.Items)
         {
             var item = await _context.Items.Include(x => x.Brand)
                 .Include(x => x.Category)
@@ -274,8 +274,8 @@ public class CatalogService : ICatalogService
                     x.Article == model.Article &&
                     x.Name == model.Name &&
                     x.Brand.Name == model.Brand &&
-                    x.Category.Name == model.Brand &&
-                    x.Stock <= model.Stock);
+                    x.Category.Name == model.Category &&
+                    x.Stock >= model.Stock);
             if (item is null)
             {
                 res.Add(new ItemCheck()
@@ -305,6 +305,50 @@ public class CatalogService : ICatalogService
                 });
             }
         }
+        return new ItemsCheck() {Items = res};
+    }
+
+    public async Task<ItemCheck> CheckItem(ItemToCheck toCheck)
+    {
+        ItemCheck res;
+        var item = await _context.Items.Include(x => x.Brand)
+            .Include(x => x.Category)
+            .SingleOrDefaultAsync(x =>
+                x.Article == toCheck.Article &&
+                x.Name == toCheck.Name &&
+                x.Brand.Name == toCheck.Brand &&
+                x.Category.Name == toCheck.Brand &&
+                x.Stock <= toCheck.Stock);
+        
+        if (item is null)
+        {
+            res = new ItemCheck()
+            {
+                Article = toCheck.Article,
+                Brand = toCheck.Brand,
+                Category = toCheck.Category,
+                Name = toCheck.Name,
+                Id = 0,
+                IsCorrect = false,
+                RequestingCount = toCheck.Stock,
+                Stock = 0
+            };
+        }
+        else
+        {
+            res = new ItemCheck()
+            {
+                Article = item.Article,
+                Brand = item.Brand.Name,
+                Category = item.Category.Name,
+                Id = item.Id,
+                IsCorrect = item.Stock >= toCheck.Stock,
+                Name = item.Name,
+                RequestingCount = toCheck.Stock,
+                Stock = item.Stock
+            };
+        }
+
         return res;
     }
 }

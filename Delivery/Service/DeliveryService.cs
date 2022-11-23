@@ -2,6 +2,7 @@
 using Delivery.Database.Entities;
 using Delivery.Exceptions;
 using Delivery.Models;
+using Infrastructure.Helpers;
 using Infrastructure.Models;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -12,67 +13,14 @@ namespace Delivery.Service;
 public class DeliveryService : IDeliveryService
 {
     private readonly DeliveryDbContext _context;
-    private readonly IRequestClient<List<ItemModel>> _request;
+    private IRequestClient<ItemsCheck> _request;
+    private IBusControl _bus;
 
-    public DeliveryService(DeliveryDbContext context, IRequestClient<List<ItemModel>> request)
+    public DeliveryService(DeliveryDbContext context, IRequestClient<ItemsCheck> request, IBusControl bus)
     {
         _context = context;
         _request = request;
-    }
-    
-    public async Task PostNewDelivery(DeliveryModel delivery)
-    {
-        if (!delivery.Items.Any())
-            throw new EmptyDeliveryException("Order doesn't contains any items");
-
-        var check = new List<ItemCheck>();
-        using (var resp = _request.Create(delivery.Items))
-        {
-            var p = await resp.GetResponse<List<ItemCheck>>();
-            check = p.Message;
-        }
-
-        if (!check.Any())
-            throw new Exception();
-
-        var items = new List<DeliveryItem>();
-        foreach (var item in delivery.Items)
-        {
-            items.Add(new DeliveryItem()
-            {
-                Article = item.Article,
-                Brand = item.Brand,
-                Category = item.Category,
-                Count = item.Count,
-                Descr = item.Descr,
-                Name = item.Name
-            });
-        }
-
-        var addressModel = AddressModel.FromString(delivery.Address);
-
-        var address = await _context.Addresses.SingleOrDefaultAsync(x =>
-            x.Region == addressModel.Region &&
-            x.City == addressModel.City &&
-            x.District == addressModel.District &&
-            x.Street == addressModel.Street &&
-            x.House == addressModel.House &&
-            x.Floor == addressModel.Floor &&
-            x.Flat == addressModel.Flat);
-        if (address is null)
-            throw new InvalidAddressException("Couldnt find this address");
-
-        await _context.Deliveries.AddAsync(new OrderDelivery()
-        {
-            Address = address,
-            AddressId = address.Id,
-            Courier = null,
-            CourierId = null,
-            Items = items,
-            Status = Status.Pending
-        });
-
-        await _context.SaveChangesAsync();
+        _bus = bus;
     }
 
     public async Task<ICollection<DeliveryModel>> GetAllFreeOrders()
@@ -92,10 +40,11 @@ public class DeliveryService : IDeliveryService
                 Address = order.Address.ToString()!,
                 CourierId = null,
                 CourierName = null,
-                CustomerId = order.Address.CustomerId,
+                CustomerLogin = order.Address.Customer.Login,
                 CustomerName = Customer.GetName(order.Address.Customer),
                 Id = order.Id,
-                Status = order.Status.ToString()
+                Status = order.Status.ToString(),
+                OrderId = order.OrderId
             });
         }
 
@@ -113,7 +62,7 @@ public class DeliveryService : IDeliveryService
             x.Status == Status.Pending
         );
         if (order is null)
-            throw new InvalidDeliveryException();
+            throw new InvalidDeliveryException("couldn't find this delivery");
 
         var courier = await _context.Couriers.SingleOrDefaultAsync(x => x.Id == courierId);
 
@@ -135,7 +84,7 @@ public class DeliveryService : IDeliveryService
             x.Status == Status.Assigned
         );
         if (order is null)
-            throw new InvalidDeliveryException();
+            throw new InvalidDeliveryException("couldn't find this delivery");
 
         order.Status = Status.InProcess;
         await _context.SaveChangesAsync();
@@ -153,9 +102,17 @@ public class DeliveryService : IDeliveryService
             x.Status == Status.InProcess
         );
         if (order is null)
-            throw new InvalidDeliveryException();
+            throw new InvalidDeliveryException("couldn't find this delivery");
 
         order.Status = Status.Delivered;
+        var res = await RabbitMQHelpers
+            .GetResponseRabbitTask<FinishOrderRequest, FinishOrderResponse>(
+                _bus,
+                new FinishOrderRequest() { Id = orderId }, 
+                new Uri("rabbitmq://localhost/order-finish-queue1")
+                );
+        if (res.Id < 1)
+            throw new Exception(res.ErrMsg);
         await _context.SaveChangesAsync();
     }
 
@@ -165,7 +122,7 @@ public class DeliveryService : IDeliveryService
             throw new ArgumentException("order id must be >= 1");
         var order = await _context.Deliveries.SingleOrDefaultAsync(x => x.Id == orderId);
         if (order is null)
-            throw new InvalidDeliveryException();
+            throw new InvalidDeliveryException("Couldn't find this delivery");
 
         return order.Status.ToString();
     }

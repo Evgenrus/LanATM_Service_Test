@@ -6,6 +6,8 @@ public class Orders
     public bool IsFinished { get; set; } = false;
     public bool IsCanceled { get; set; } = false;
     public bool IsOnDelivery { get; set; } = false;
+    
+    public int? DeliveryId { get; set; }
 
     public int CustomerId { get; set; }
     public Customer Customer { get; set; }

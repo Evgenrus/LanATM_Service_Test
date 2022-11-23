@@ -1,11 +1,11 @@
 ﻿using Delivery.Database.Entities;
 using Delivery.Models;
+using Infrastructure.Models;
 
 namespace Delivery.Service;
 
 public interface IDeliveryService
 {
-    public Task PostNewDelivery(DeliveryModel delivery);
     public Task<ICollection<DeliveryModel>> GetAllFreeOrders();
     public Task BeginOrderDelivery(int orderId, int courierId);
     public Task ReceiveOrderFromStock(int orderId, int courierId);

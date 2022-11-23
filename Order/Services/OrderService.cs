@@ -8,15 +8,21 @@ using Order.Database.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using Infrastructure.Helpers;
+using Infrastructure.Models;
+using MassTransit;
 using Order.Exceptions;
 
 namespace Order.Services;
 public class OrderService : IOrderService
 {
     private OrderDbContext _context { get; set; }
+    private IBusControl _bus { get; set; }
 
-    public OrderService(OrderDbContext context) {
+    public OrderService(OrderDbContext context, IBusControl bus)
+    {
         _context = context;
+        _bus = bus;
     }
 
     public async Task<CartModel> GetCartById(int id)
@@ -96,7 +102,8 @@ public class OrderService : IOrderService
             IsCanceled = order.IsCanceled,
             IsFinished = order.IsFinished,
             IsOnDelivery = order.IsOnDelivery,
-            Items = new List<ItemModel>()
+            Items = new List<ItemModel>(),
+            DeliveryId = order.DeliveryId
         };
 
         foreach (var item in order.Items)
@@ -144,7 +151,8 @@ public class OrderService : IOrderService
                 Items = items,
                 IsCanceled = order.IsCanceled,
                 IsFinished = order.IsFinished,
-                IsOnDelivery = order.IsOnDelivery
+                IsOnDelivery = order.IsOnDelivery,
+                DeliveryId = order.DeliveryId
             });
         }
 
@@ -163,31 +171,98 @@ public class OrderService : IOrderService
         if(customer is null)
             throw new InvalidCustomerException("couldn't find customer with such Id");
 
-        //TODO Check Items
-
-        var items = new List<OrderItem>();
-
-        foreach (var item in model.Items)
+        var check = new ItemsToCheckList() {Items = new List<ItemToCheck>()};
+        foreach (var modelItem in model.Items)
         {
-            items.Add(new OrderItem() {
+            check.Items.Add(new ItemToCheck()
+            {
+                Article = modelItem.Article,
+                Brand = modelItem.Brand,
+                Category = modelItem.Category,
+                Descr = modelItem.Descr,
+                Name = modelItem.Name,
+                Stock = modelItem.Count,
+                Id = 0
+            });
+        }
+
+        var response = await RabbitMQHelpers.GetResponseRabbitTask<ItemsToCheckList, ItemsCheck>(_bus, check,
+            new Uri("rabbitmq://localhost/items-queue1"));
+        foreach (var itemCheck in response.Items)
+        {
+            if (!itemCheck.IsCorrect)
+                throw new ItemCheckFailedException("wrong");
+        }
+
+        if (response.Items.Any(responseItem => responseItem.IsCorrect == false))
+        {
+            throw new ItemCheckFailedException("Items check has failed");
+        }
+
+        var items = model.Items.Select(item => new OrderItem()
+            {
                 Name = item.Name,
                 Article = item.Article,
                 Descr = item.Descr,
                 Brand = item.Brand,
                 Category = item.Category,
                 Count = item.Count
-            });
-        }
-
-        await _context.Orders.AddAsync(new Orders() {
+            })
+            .ToList();
+        var order = new Orders()
+        {
             Customer = customer,
             CustomerId = customer.Id,
             Items = items,
-            IsCanceled = model.IsCanceled,
+            IsCanceled = false,
             IsOnDelivery = model.IsOnDelivery,
-            IsFinished = model.IsFinished
-        });
+            IsFinished = false,
+        };
+        await _context.Orders.AddAsync(order);
+        await _context.SaveChangesAsync();
+        
+        if (model.IsOnDelivery)
+        {
+            var deliveryRequest = new DeliveryRequest()
+            {
+                Address = model.Address!,
+                CustomerLogin = customer.Login,
+                CustomerName = customer.Name,
+                Items = check,
+                Id = order.Id
+            };
+            var postDelivery = await RabbitMQHelpers.GetResponseRabbitTask<DeliveryRequest, DeliveryResponse>(
+                _bus,
+                deliveryRequest,
+                new Uri("rabbitmq://localhost/delivery-post-queue1")
+            );
+            if (postDelivery.DeliveryId < 1)
+            {
+                order.IsCanceled = true;
+                await _context.SaveChangesAsync();
+                throw new PostDeliveryFailedException(postDelivery.ErrMsg ?? "Unknown error");
+            }
 
+            order.DeliveryId = deliveryRequest.Id;
+            model.DeliveryId = deliveryRequest.Id;
+            var restockitems = new List<RestockRequest>();
+            foreach (var orderItem in items)
+            {
+                restockitems.Add(new RestockRequest
+                {
+                    Article = orderItem.Article, Change = orderItem.Count
+                });
+            }
+
+            var restock = await RabbitMQHelpers
+                .GetResponseRabbitTask<RestockRequestList, RestockRespList>(
+                    _bus,
+                    new RestockRequestList() {Items = restockitems},
+                    new Uri("rabbitmq://localhost/items-order-queue1")
+                    );
+
+            await _context.SaveChangesAsync();
+        }
         return model;
     }
 
@@ -241,17 +316,16 @@ public class OrderService : IOrderService
         await _context.CartItems.AddAsync(item);
         await _context.SaveChangesAsync();
 
-        var itemmodels = new List<ItemModel>();
-        foreach(var prod in cart.Items) {
-            itemmodels.Add(new ItemModel() {
+        var itemmodels = cart.Items.Select(prod => new ItemModel()
+            {
                 Name = prod.Name,
                 Article = prod.Article,
                 Descr = prod.Descr,
                 Brand = prod.Brand,
                 Category = prod.Category,
                 Count = prod.Count
-            });
-        }
+            })
+            .ToList();
 
         return new CartModel() {
             Id = cart.Id,
@@ -264,19 +338,49 @@ public class OrderService : IOrderService
         if (orderId < 0)
             throw new ArgumentException("OrderId should be >= 0");
 
-        var order = await _context.Orders.SingleOrDefaultAsync(x => x.Id == orderId);
+        var order = await _context.Orders.Include(x => x.Items)
+            .SingleOrDefaultAsync(x => x.Id == orderId);
         if (order is null)
             throw new InvalidOrderException("No such order");
         if (order.IsCanceled == true)
             throw new AlreadyCanceledException("This order is canceled already");
-        
-        //TODO /api/v1/Delivery/CancelOrder
+
+
+        var res = await RabbitMQHelpers
+            .GetResponseRabbitTask<DeliveryCancelRequest, DeliveryCancelAnswer>(
+                _bus,
+                new DeliveryCancelRequest() { DeliveryId = order.Id },
+                new Uri("rabbitmq://localhost/delivery-cancel-queue1")
+                );
+        if (res.Id < 1)
+            throw new CancelDeliveryFailedException(res.ErrMsg ?? "Unknown error");
 
         order.IsCanceled = true;
 
-        await _context.SaveChangesAsync();
+        var restocklist = new List<RestockRequest>();
+        foreach (var item in order.Items)
+        {
+            restocklist.Add(new RestockRequest()
+            {
+                Article = item.Article,
+                Change = item.Count
+            });
+        }
 
-        return;
+        var restock = await RabbitMQHelpers
+            .GetResponseRabbitTask<ICollection<RestockRequest>, ICollection<RestockResp>>(
+                _bus,
+                restocklist,
+                new Uri("rabbitmq://localhost/items-restock-queue1")
+            );
+
+        foreach (var resp in restock)
+        {
+            if (!string.IsNullOrEmpty(resp.ErrMsg))
+                throw new InvalidItemException(resp.ErrMsg);
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task<CustomerModel> GetCustomerByLogin(string Login)

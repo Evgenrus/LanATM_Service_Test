@@ -14,6 +14,7 @@ public sealed class DeliveryDbContext : DbContext
     public DeliveryDbContext(DbContextOptions<DeliveryDbContext> options)
         : base(options)
     {
+        //Database.EnsureDeleted();
         Database.EnsureCreated();
     }
 

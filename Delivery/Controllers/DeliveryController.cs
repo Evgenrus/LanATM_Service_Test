@@ -1,5 +1,7 @@
 using Delivery.Models;
 using Delivery.Service;
+using Infrastructure.Models;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Delivery.Controllers;
@@ -10,28 +12,30 @@ public class WeatherForecastController : ControllerBase
 {
     private readonly ILogger<WeatherForecastController> _logger;
     private readonly IDeliveryService _service;
+    private IRequestClient<ItemsToCheckList> _request;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger, IDeliveryService service)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IDeliveryService service, IRequestClient<ItemsToCheckList> request)
     {
         _logger = logger;
         _service = service;
+        _request = request;
     }
 
-    [HttpPost]
-    public async Task<ActionResult> PostNewDelivery(DeliveryModel delivery)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest();
-        try
-        {
-            await _service.PostNewDelivery(delivery);
-            return NoContent();
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-    }
+    // [HttpPost]
+    // public async Task<ActionResult> PostNewDelivery(DeliveryModel delivery)
+    // {
+    //     if (!ModelState.IsValid)
+    //         return BadRequest();
+    //     try
+    //     {
+    //         await _service.PostNewDelivery(delivery);
+    //         return NoContent();
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         return BadRequest(e.Message);
+    //     }
+    // }
 
     [HttpGet]
     public async Task<ActionResult<ICollection<DeliveryModel>>> GetAllFreeOrders()
