@@ -159,20 +159,34 @@ public class OrderService : IOrderService
         return res;
     }
 
-    public async Task<OrderModel> PostOrder(OrderModel model, int customerId)
+    public async Task<OrderModel> PostOrder(PostOrderModel model)
     {
-        if(customerId < 0)
+        if(model.CustomerId < 0)
             throw new ArgumentException("Id must be >= 0");
 
-        if (model.Items is null)
+        var cart = await _context.Carts.Include(x => x.Items).SingleOrDefaultAsync(x => x.CustomerId == model.CustomerId && x.Id == model.CartId);
+        if (cart is null)
+            throw new InvalidCartException("No such cart");
+
+        if (cart.Items is null)
             throw new InvalidOrderException("Order can't be empty");
 
-        var customer = await _context.Customers.FindAsync(customerId);
+        var cartItems = cart.Items.Select(item => new ItemModel()
+        {
+            Article = item.Article,
+            Brand = item.Brand,
+            Category = item.Category,
+            Count = item.Count,
+            Descr = item.Descr,
+            Name = item.Name
+        }).ToList();
+
+        var customer = await _context.Customers.FindAsync(model.CustomerId);
         if(customer is null)
             throw new InvalidCustomerException("couldn't find customer with such Id");
 
         var check = new ItemsToCheckList() {Items = new List<ItemToCheck>()};
-        foreach (var modelItem in model.Items)
+        foreach (var modelItem in cart.Items)
         {
             check.Items.Add(new ItemToCheck()
             {
@@ -199,7 +213,7 @@ public class OrderService : IOrderService
             throw new ItemCheckFailedException("Items check has failed");
         }
 
-        var items = model.Items.Select(item => new OrderItem()
+        var items = cart.Items.Select(item => new OrderItem()
             {
                 Name = item.Name,
                 Article = item.Article,
@@ -220,6 +234,16 @@ public class OrderService : IOrderService
         };
         await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
+
+        var orderModel = new OrderModel()
+        {
+            Address = model.Address,
+            Id = order.Id,
+            IsCanceled = false,
+            IsFinished = false,
+            IsOnDelivery = model.IsOnDelivery,
+            Items = cartItems
+        };
         
         if (model.IsOnDelivery)
         {
@@ -244,7 +268,7 @@ public class OrderService : IOrderService
             }
 
             order.DeliveryId = deliveryRequest.Id;
-            model.DeliveryId = deliveryRequest.Id;
+            orderModel.DeliveryId = deliveryRequest.Id;
             var restockitems = new List<RestockRequest>();
             foreach (var orderItem in items)
             {
@@ -263,7 +287,7 @@ public class OrderService : IOrderService
 
             await _context.SaveChangesAsync();
         }
-        return model;
+        return orderModel;
     }
 
     public async Task<CartModel> NewCart(int customerId)
@@ -368,13 +392,13 @@ public class OrderService : IOrderService
         }
 
         var restock = await RabbitMQHelpers
-            .GetResponseRabbitTask<ICollection<RestockRequest>, ICollection<RestockResp>>(
+            .GetResponseRabbitTask<RestockRequestList, RestockRespList>(
                 _bus,
-                restocklist,
+                new RestockRequestList() {Items = restocklist},
                 new Uri("rabbitmq://localhost/items-restock-queue1")
             );
 
-        foreach (var resp in restock)
+        foreach (var resp in restock.Items)
         {
             if (!string.IsNullOrEmpty(resp.ErrMsg))
                 throw new InvalidItemException(resp.ErrMsg);

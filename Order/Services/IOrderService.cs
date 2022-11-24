@@ -9,7 +9,7 @@ public interface IOrderService
     public Task<CustomerModel> GetCustomerByLogin(string Login);
     public Task<OrderModel> GetOrderById(int id);
     public Task<ICollection<OrderModel>> GetOrdersByCustomerId(int id);
-    public Task<OrderModel> PostOrder(OrderModel model, int customerId);
+    public Task<OrderModel> PostOrder(PostOrderModel model);
     public Task<CartModel> NewCart(int customerId);
     public Task<CartModel> AddItemToCart(ItemModel model, int cartId, int customerId);
     public Task CancelOrder(int orderId);

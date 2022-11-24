@@ -4,7 +4,7 @@ using MassTransit;
 
 namespace Catalog.Consumers;
 
-public class RestockRequestConsumer : IConsumer<RestockRequest>
+public class RestockRequestConsumer : IConsumer<RestockRequestList>
 {
     private IRabbitmqService _service;
     private IBusControl _bus;
@@ -15,7 +15,7 @@ public class RestockRequestConsumer : IConsumer<RestockRequest>
         _bus = bus;
     }
 
-    public async Task Consume(ConsumeContext<RestockRequest> context)
+    public async Task Consume(ConsumeContext<RestockRequestList> context)
     {
         try
         {

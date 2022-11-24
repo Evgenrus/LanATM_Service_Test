@@ -10,8 +10,8 @@
         }
       ],
       "UpstreamPathTemplate": "/api/v1/Catalog/{everything}",
-      "UpstreamHttpsMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
-      "SwaggerKey": "Catalog"
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
+      "SwaggerKey": "catalog"
     },
 
     {
@@ -20,12 +20,12 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7108
+          "Port": 7103
         }
       ],
       "UpstreamPathTemplate": "/api/v1/Order/{everything}",
-      "UpstreamHttpsMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
-      "SwaggerKey": "Order"
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
+      "SwaggerKey": "order"
     },
 
     {
@@ -38,13 +38,13 @@
         }
       ],
       "UpstreamPathTemplate": "/api/v1/Delivery/{everything}",
-      "UpstreamHttpsMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
-      "SwaggerKey": "Delivery"
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
+      "SwaggerKey": "delivery"
     }
   ],
   "SwaggerEndPoints": [
     {
-      "Key": "Catalog",
+      "Key": "catalog",
       "Config": [
         {
           "Name": "Catalog",
@@ -55,18 +55,18 @@
     },
 
     {
-      "Key": "Order",
+      "Key": "order",
       "Config": [
         {
           "Name": "Orders",
           "Version": "v1",
-          "Url": "https://localhost:7108/swagger/v1/swagger.json"
+          "Url": "https://localhost:7103/swagger/v1/swagger.json"
         }
       ]
     },
 
     {
-      "Key": "Delivery",
+      "Key": "delivery",
       "Config": [
         {
           "Name": "Delivery",

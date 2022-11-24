@@ -15,18 +15,27 @@ builder.WebHost.ConfigureAppConfiguration(webBuilder =>
     webBuilder.AddJsonFile("ocelot.json");
 });
 
+builder.Services.AddSwaggerForOcelot(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
 }
+
+app.UseSwaggerForOcelotUI(options =>
+{
+    //options.DownstreamSwaggerEndPointBasePath = "/swagger";
+    options.PathToSwaggerGenerator = "/swagger/docs";
+    //options.SwaggerEndpoint("https://localhost:7000/swagger", "Gateway");
+});
 
 app.UseOcelot().Wait();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

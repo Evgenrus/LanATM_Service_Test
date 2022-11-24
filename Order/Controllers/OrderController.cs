@@ -85,13 +85,13 @@ public class OrderController : ControllerBase
     } 
 
     [HttpPost]
-    public async Task<ActionResult<OrderModel>> PostOrder(OrderModel model, int customerId) {
+    public async Task<ActionResult<OrderModel>> PostOrder(PostOrderModel model, int customerId) {
         if(!ModelState.IsValid)
             return BadRequest();
 
         try
         {
-            var res = await _service.PostOrder(model, customerId);
+            var res = await _service.PostOrder(model);
             return Ok(res);
         }
         catch (Exception ex)
