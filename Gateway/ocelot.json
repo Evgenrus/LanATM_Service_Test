@@ -1,0 +1,79 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/v1/Catalog/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7191
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/Catalog/{everything}",
+      "UpstreamHttpsMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
+      "SwaggerKey": "Catalog"
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/v1/Order/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7108
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/Order/{everything}",
+      "UpstreamHttpsMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
+      "SwaggerKey": "Order"
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/v1/Delivery/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7241
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/Delivery/{everything}",
+      "UpstreamHttpsMethod": [ "Get", "Post", "Put", "Delete", "Patch" ],
+      "SwaggerKey": "Delivery"
+    }
+  ],
+  "SwaggerEndPoints": [
+    {
+      "Key": "Catalog",
+      "Config": [
+        {
+          "Name": "Catalog",
+          "Version": "v1",
+          "Url": "https://localhost:7191/swagger/v1/swagger.json"
+        }
+      ]
+    },
+
+    {
+      "Key": "Order",
+      "Config": [
+        {
+          "Name": "Orders",
+          "Version": "v1",
+          "Url": "https://localhost:7108/swagger/v1/swagger.json"
+        }
+      ]
+    },
+
+    {
+      "Key": "Delivery",
+      "Config": [
+        {
+          "Name": "Delivery",
+          "Version": "v1",
+          "Url": "https://localhost:7241/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ]
+}
