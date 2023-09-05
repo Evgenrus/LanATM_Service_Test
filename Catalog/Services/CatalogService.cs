@@ -129,8 +129,7 @@ public class CatalogService : ICatalogService
 
         return result;
     }
-
-    //TODO Add requests to Order and Delivery to actualize items database
+    
     public async Task PostNewItem(ItemModel model)
     {
         var brand = await _context.Brands.SingleOrDefaultAsync(x => x.Name == model.Brand);
@@ -140,6 +139,10 @@ public class CatalogService : ICatalogService
         var category = await _context.Categories.SingleOrDefaultAsync(x => x.Name == model.Category);
         if (category is null)
             throw new InvalidCategoryException($"No category with name {category}");
+
+        var item = await _context.Items.SingleOrDefaultAsync(x => x.Article == model.Article);
+        if (item is not null)
+            throw new InvalidItemException($"Item with article '{model.Article} already exists'");
 
         await _context.AddAsync(new Item()
         {
